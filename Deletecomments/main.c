@@ -8,11 +8,51 @@
 
 #include <stdio.h>
 
-int main(int argc, const char * argv[])
+static void process(FILE *f)
 {
+    int c;
+    while ( (c=getc(f)) != EOF )
+    {
+        if (c=='\'' || c=='"')
+        {
+            int q=c;
+            do
+            {
+                putchar(c);
+                if (c=='\\') putchar(getc(f));
+                c=getc(f);
+            } while (c!=q);
+            putchar(c);
+        }
+        else if (c=='/')
+        {
+            c=getc(f);
+            if (c!='*')
+            {
+                putchar('/');
+                ungetc(c,f);
+            }
+            else
+            {
+                int p;
+                putchar(' ');
+                do
+                {
+                    p=c;
+                    c=getc(f);
+                } while (c!='/' || p!='*');
+            }
+        }
+        else
+        {
+            putchar(c);
+        }
+    }
+}
 
-    // insert code here...
-    printf("Hello, World!\n");
+int main(int argc, char *argv[])
+{
+    process(stdin);
     return 0;
 }
 
